@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints
+
+# Logs
+*.log
+data_ingestion.log
+
+# Data files (optional - uncomment if you don't want to commit data)
+# *.csv
+# *.xlsx
+# *.xls
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Power BI
+*.pbix
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+
+# SQL Server backup files
+*.bak
+*.trn

@@ -1,0 +1,218 @@
+-- =============================================
+-- Power BI DAX Measures for Orders Analytics
+-- =============================================
+-- Copy these measures into Power BI Desktop
+-- =============================================
+
+-- =============================================
+-- Core Measures
+-- =============================================
+
+Total Sales = 
+SUM(orders_[sale_price]) * SUM(orders_[quantity])
+
+Total Profit = 
+SUM(orders_[profit])
+
+Total Quantity = 
+SUM(orders_[quantity])
+
+Orders Count = 
+DISTINCTCOUNT(orders_[order_id])
+
+-- =============================================
+-- Profit Margin Measures
+-- =============================================
+
+Profit Margin % = 
+DIVIDE(
+    [Total Profit],
+    [Total Sales],
+    0
+) * 100
+
+Average Order Value = 
+DIVIDE(
+    [Total Sales],
+    [Orders Count],
+    0
+)
+
+Average Profit per Order = 
+DIVIDE(
+    [Total Profit],
+    [Orders Count],
+    0
+)
+
+-- =============================================
+-- Discount Measures
+-- =============================================
+
+Total Discount = 
+SUMX(
+    orders_,
+    orders_[sale_price] * orders_[quantity] * (orders_[discount] / 100)
+)
+
+Net Sales = 
+[Total Sales] - [Total Discount]
+
+Avg Discount % = 
+AVERAGE(orders_[discount])
+
+-- =============================================
+-- Time Intelligence Measures
+-- =============================================
+
+Sales YTD = 
+TOTALYTD(
+    [Total Sales],
+    dim_date[date_value]
+)
+
+Sales LY = 
+CALCULATE(
+    [Total Sales],
+    SAMEPERIODLASTYEAR(dim_date[date_value])
+)
+
+Sales YoY Growth % = 
+DIVIDE(
+    [Total Sales] - [Sales LY],
+    [Sales LY],
+    0
+) * 100
+
+Profit YTD = 
+TOTALYTD(
+    [Total Profit],
+    dim_date[date_value]
+)
+
+Profit LY = 
+CALCULATE(
+    [Total Profit],
+    SAMEPERIODLASTYEAR(dim_date[date_value])
+)
+
+Profit YoY Growth % = 
+DIVIDE(
+    [Total Profit] - [Profit LY],
+    [Profit LY],
+    0
+) * 100
+
+-- =============================================
+-- Additional Useful Measures
+-- =============================================
+
+Sales MTD = 
+TOTALMTD(
+    [Total Sales],
+    dim_date[date_value]
+)
+
+Sales QTD = 
+TOTALQTD(
+    [Total Sales],
+    dim_date[date_value]
+)
+
+Sales Previous Month = 
+CALCULATE(
+    [Total Sales],
+    PREVIOUSMONTH(dim_date[date_value])
+)
+
+Sales Month over Month Growth % = 
+DIVIDE(
+    [Total Sales] - [Sales Previous Month],
+    [Sales Previous Month],
+    0
+) * 100
+
+Average Sales per Day = 
+DIVIDE(
+    [Total Sales],
+    DISTINCTCOUNT(dim_date[date_value]),
+    0
+)
+
+Top Product Revenue = 
+CALCULATE(
+    [Total Sales],
+    TOPN(
+        1,
+        VALUES(orders_[product_id]),
+        [Total Sales],
+        DESC
+    )
+)
+
+-- =============================================
+-- Segment/Category/Region Specific Measures
+-- =============================================
+
+Sales by Segment = 
+SUMX(
+    VALUES(orders_[segment]),
+    [Total Sales]
+)
+
+Sales by Category = 
+SUMX(
+    VALUES(orders_[category]),
+    [Total Sales]
+)
+
+Sales by Region = 
+SUMX(
+    VALUES(orders_[region]),
+    [Total Sales]
+)
+
+-- =============================================
+-- Discount Impact Measures
+-- =============================================
+
+Profit Margin with Discount = 
+DIVIDE(
+    [Total Profit],
+    [Net Sales],
+    0
+) * 100
+
+Discount Impact on Profit = 
+[Total Profit] - 
+CALCULATE(
+    [Total Profit],
+    ALL(orders_[discount])
+)
+
+-- =============================================
+-- Product Performance Measures
+-- =============================================
+
+Top N Products by Revenue = 
+VAR TopN = 10
+RETURN
+    CALCULATE(
+        [Total Sales],
+        TOPN(
+            TopN,
+            VALUES(orders_[product_id]),
+            [Total Sales],
+            DESC
+        )
+    )
+
+Product Count = 
+DISTINCTCOUNT(orders_[product_id])
+
+Average Revenue per Product = 
+DIVIDE(
+    [Total Sales],
+    [Product Count],
+    0
+)
