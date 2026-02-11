@@ -44,3 +44,6 @@ Thumbs.db
 # SQL Server backup files
 *.bak
 *.trn
+
+# Commit message helpers (local use)
+strip_commit_msg.ps1
